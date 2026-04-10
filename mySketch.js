@@ -19,7 +19,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   generateTreeline();
   // A handful of slow, subtle clouds
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 12; i++) {
     clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.55)));
   }
 }
@@ -81,16 +81,6 @@ function draw() {
     cloud.show();
   }
 
-  // Distant treeline silhouette at the horizon
-  drawTreeline();
-
-  // Ground layer — birds take off from the grass
-  noStroke();
-  fill(34, 100, 20);
-  rect(0, windowHeight - 60, windowWidth, 60);
-  fill(50, 140, 30);
-  rect(0, windowHeight - 68, windowWidth, 16);
-
   // Update flock centroid for cohesion
   if (particles.length > 0) {
     flockX = 0; flockY = 0;
@@ -113,6 +103,14 @@ function draw() {
       particles.splice(i, 1);
     }
   }
+
+  // Treeline and grass drawn last so text emerges from behind them
+  drawTreeline();
+  noStroke();
+  fill(34, 100, 20);
+  rect(0, windowHeight - 60, windowWidth, 60);
+  fill(50, 140, 30);
+  rect(0, windowHeight - 68, windowWidth, 16);
 }
 
 class Cloud {
