@@ -8,17 +8,26 @@
 // - Change the movement - try playing with the alpha and direction
 
 particles = [];
+clouds = [];
 //Just like with Tracery, put anything you want in the ""s
 words = ["mourning dove","house finch","tufted titmouse","northern cardinal","blue jay","brown thrasher","red-bellied woodpecker","northern mockingbird"]
 function setup() {
 	//This creates a canvas the size of the screen
   createCanvas(windowWidth, windowHeight);
+  // Create some clouds at random positions across the sky
+  for (let i = 0; i < 6; i++) {
+    clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.6)));
+  }
 }
 
 function draw() {
-	//Replace this with any background color you choose
-	//Or you could load an image or try a gradient!
-  background("#1D075D");
+	//Sky blue background
+  background("#87CEEB");
+  // Draw clouds before particles so they appear behind the text
+  for (let cloud of clouds) {
+    cloud.update();
+    cloud.show();
+  }
 	//This creates the particles
   for (let i = 0; i < 3; i++) {
     let p = new Particle();
@@ -32,6 +41,36 @@ function draw() {
       // remove this particle
       particles.splice(i, 1);
     }
+  }
+}
+
+class Cloud {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = random(60, 120);
+    this.speed = random(0.2, 0.8);
+  }
+
+  update() {
+    this.x += this.speed;
+    // Wrap around when the cloud drifts off the right edge
+    if (this.x > windowWidth + this.size * 2) {
+      this.x = -this.size * 2;
+      this.y = random(windowHeight * 0.6);
+    }
+  }
+
+  show() {
+    noStroke();
+    fill(255, 255, 255, 200);
+    // Fluffy cloud shape built from overlapping ellipses
+    let s = this.size;
+    ellipse(this.x,           this.y,           s * 1.2, s * 0.8);
+    ellipse(this.x - s * 0.5, this.y + s * 0.1, s * 0.9, s * 0.7);
+    ellipse(this.x + s * 0.5, this.y + s * 0.1, s * 0.9, s * 0.7);
+    ellipse(this.x - s * 0.3, this.y - s * 0.3, s * 0.9, s * 0.8);
+    ellipse(this.x + s * 0.3, this.y - s * 0.3, s * 0.9, s * 0.8);
   }
 }
 
@@ -49,7 +88,7 @@ class Particle {
 		//Try using it for all three to create a broader range of color
 		//Or try changing the scale to use the full 0-255
 		this.color = random(100,230);
-		//This sets the starting alpha so it starts bright and fades 
+		//This sets the starting alpha so it starts bright and fades
 		//Try reversing it! you can start at 0, add 1, and stop at 255
     this.alpha = 255;
 		//This picks a random word for each particle
