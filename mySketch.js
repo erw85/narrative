@@ -9,7 +9,7 @@
 
 particles = [];
 //Just like with Tracery, put anything you want in the ""s
-words = ["fall","drop","fly","break","rise","see","hear","move","shift"]
+words = ["mourning dove","house finch","tufted titmouse","northern cardinal","blue jay","brown thrasher","red-bellied woodpecker","northern mockingbird"]
 function setup() {
 	//This creates a canvas the size of the screen
   createCanvas(windowWidth, windowHeight);
