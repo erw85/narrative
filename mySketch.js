@@ -43,7 +43,7 @@ class Particle {
 		//This sets the range of x movement - try limiting it to + or -
     this.vx = random(-1, 1);
 		//This sets the range of y movement - try reversing it
-    this.vy = random(-1, -2.5);
+    this.vy = random(-5, -1);
 		//This sets the starting alpha so it starts bright and fades
 		//Try reversing it! you can start at 0, add 1, and stop at 255
     this.alpha = 255;
