@@ -8,19 +8,81 @@
 // - Change the movement - try playing with the alpha and direction
 
 particles = [];
+clouds = [];
+treeline = [];
 flockX = 0;
 flockY = 0;
 //Just like with Tracery, put anything you want in the ""s
 words = ["mourning dove","house finch","tufted titmouse","northern cardinal","blue jay","brown thrasher","red-bellied woodpecker","northern mockingbird"]
 
 function setup() {
-	//This creates a canvas the size of the screen
   createCanvas(windowWidth, windowHeight);
+  generateTreeline();
+  // A handful of slow, subtle clouds
+  for (let i = 0; i < 5; i++) {
+    clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.55)));
+  }
+}
+
+function generateTreeline() {
+  treeline = [];
+  let baseY = windowHeight - 60;
+  let x = 0;
+  while (x <= windowWidth + 60) {
+    let treeW = random(28, 72);
+    let treeH = random(45, 145);
+    if (random() > 0.4) {
+      // Pine-like: single sharp peak
+      treeline.push({x: x,             y: baseY});
+      treeline.push({x: x + treeW/2,   y: baseY - treeH});
+      treeline.push({x: x + treeW,     y: baseY});
+    } else {
+      // Deciduous: rounded double-bump
+      treeline.push({x: x,              y: baseY});
+      treeline.push({x: x + treeW*0.25, y: baseY - treeH*0.75});
+      treeline.push({x: x + treeW*0.5,  y: baseY - treeH});
+      treeline.push({x: x + treeW*0.75, y: baseY - treeH*0.75});
+      treeline.push({x: x + treeW,      y: baseY});
+    }
+    x += treeW * random(0.55, 0.95);
+  }
+}
+
+function drawSky() {
+  // Gradient from deep blue at top to pale horizon blue at bottom
+  let topCol    = color(25,  70,  150);
+  let bottomCol = color(140, 205, 235);
+  noStroke();
+  let strips = 80;
+  for (let i = 0; i < strips; i++) {
+    fill(lerpColor(topCol, bottomCol, i / strips));
+    rect(0, (i / strips) * windowHeight, windowWidth, windowHeight / strips + 1);
+  }
+}
+
+function drawTreeline() {
+  fill(20, 55, 20);
+  noStroke();
+  beginShape();
+  vertex(0, windowHeight);
+  for (let p of treeline) {
+    vertex(p.x, p.y);
+  }
+  vertex(windowWidth, windowHeight);
+  endShape(CLOSE);
 }
 
 function draw() {
-	//Sky blue background
-  background("#87CEEB");
+  drawSky();
+
+  // Clouds float in the sky behind everything else
+  for (let cloud of clouds) {
+    cloud.update();
+    cloud.show();
+  }
+
+  // Distant treeline silhouette at the horizon
+  drawTreeline();
 
   // Ground layer — birds take off from the grass
   noStroke();
@@ -37,12 +99,12 @@ function draw() {
     flockY /= particles.length;
   }
 
-	//This creates the particles
+  //This creates the particles
   for (let i = 0; i < 3; i++) {
     let p = new Particle();
     particles.push(p);
   }
-	//This moves the particles
+  //This moves the particles
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update();
     particles[i].show();
@@ -53,22 +115,59 @@ function draw() {
   }
 }
 
+class Cloud {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.speed = random(0.1, 0.35);
+    this.alpha = random(110, 170);
+    let base = random(40, 90);
+    this.halfWidth = base * 2.2;
+    this.bumps = [];
+    let count = floor(random(4, 9));
+    for (let i = 0; i < count; i++) {
+      this.bumps.push({
+        ox: random(-base, base),
+        oy: random(-base * 0.25, base * 0.25),
+        w:  random(base * 0.6, base * 1.3),
+        h:  random(base * 0.4, base * 0.85),
+      });
+    }
+  }
+
+  update() {
+    this.x += this.speed;
+    if (this.x > windowWidth + this.halfWidth) {
+      this.x = -this.halfWidth;
+      this.y = random(windowHeight * 0.55);
+    }
+  }
+
+  show() {
+    noStroke();
+    fill(255, 255, 255, this.alpha);
+    for (let b of this.bumps) {
+      ellipse(this.x + b.ox, this.y + b.oy, b.w, b.h);
+    }
+  }
+}
+
 class Particle {
   constructor() {
-		//This sets the x value to anywhere - try using a static value
+    //This sets the x value to anywhere - try using a static value
     this.x = random(0, windowWidth);
-		//This keeps the y fixed - try reversing it using windowHeight
+    //This keeps the y fixed - try reversing it using windowHeight
     this.y = windowHeight;
     // Base horizontal drift — wind and flocking are layered on top each frame
     this.baseVx = random(-1, 1);
-		//This sets the range of y movement - try reversing it
+    //This sets the range of y movement - try reversing it
     this.vy = random(-5, -1);
     // Random phase for wind drift so each bird sways differently
     this.phase = random(TWO_PI);
-		//This sets the starting alpha so it starts bright and fades
+    //This sets the starting alpha so it starts bright and fades
     this.alpha = 255;
-		//This picks a random word for each particle
-		this.text = random(words);
+    //This picks a random word for each particle
+    this.text = random(words);
   }
 
   finished() {
@@ -92,7 +191,7 @@ class Particle {
     // Color by altitude — dark near the ground, bright red high in the sky
     let brightness = map(this.y, windowHeight, 0, 0.35, 1.0);
     fill(255 * brightness, 0, 0, this.alpha);
-		//This positions the text
+    //This positions the text
     text(this.text, this.x, this.y);
   }
 }
