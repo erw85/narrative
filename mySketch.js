@@ -50,7 +50,7 @@ function generateTreeline() {
 
 function drawSky() {
   // Gradient from deep blue at top to pale horizon blue at bottom
-  let topCol    = color(25,  70,  150);
+  let topCol    = color(80,  150, 220);
   let bottomCol = color(140, 205, 235);
   noStroke();
   let strips = 80;
