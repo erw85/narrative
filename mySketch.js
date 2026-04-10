@@ -8,26 +8,16 @@
 // - Change the movement - try playing with the alpha and direction
 
 particles = [];
-clouds = [];
 //Just like with Tracery, put anything you want in the ""s
 words = ["mourning dove","house finch","tufted titmouse","northern cardinal","blue jay","brown thrasher","red-bellied woodpecker","northern mockingbird"]
 function setup() {
 	//This creates a canvas the size of the screen
   createCanvas(windowWidth, windowHeight);
-  // Create some clouds at random positions across the sky
-  for (let i = 0; i < 6; i++) {
-    clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.6)));
-  }
 }
 
 function draw() {
 	//Sky blue background
   background("#87CEEB");
-  // Draw clouds before particles so they appear behind the text
-  for (let cloud of clouds) {
-    cloud.update();
-    cloud.show();
-  }
 	//This creates the particles
   for (let i = 0; i < 3; i++) {
     let p = new Particle();
@@ -43,47 +33,6 @@ function draw() {
     }
   }
 }
-
-class Cloud {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.speed = random(0.2, 0.8);
-    // Each cloud gets its own transparency, consistent across all its bumps
-    this.alpha = random(150, 230);
-    // Build a unique set of bumps for this cloud
-    let base = random(40, 100);
-    this.halfWidth = base * 2.2;
-    this.bumps = [];
-    let count = floor(random(4, 9));
-    for (let i = 0; i < count; i++) {
-      this.bumps.push({
-        ox: random(-base, base),
-        oy: random(-base * 0.25, base * 0.25),
-        w:  random(base * 0.6, base * 1.3),
-        h:  random(base * 0.4, base * 0.85),
-      });
-    }
-  }
-
-  update() {
-    this.x += this.speed;
-    // Wrap around when the cloud drifts off the right edge
-    if (this.x > windowWidth + this.halfWidth) {
-      this.x = -this.halfWidth;
-      this.y = random(windowHeight * 0.6);
-    }
-  }
-
-  show() {
-    noStroke();
-    fill(255, 255, 255, this.alpha);
-    for (let b of this.bumps) {
-      ellipse(this.x + b.ox, this.y + b.oy, b.w, b.h);
-    }
-  }
-}
-
 
 class Particle {
   constructor() {
