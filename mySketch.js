@@ -53,7 +53,10 @@ class Particle {
       "blue jay":          [30,  100, 220],
       "brown thrasher":    [101, 55,  0  ],
       "mourning dove":     [180, 160, 140],
-      "tufted titmouse":   [130, 130, 130],
+      "tufted titmouse":        [130, 130, 130],
+      "house finch":            [255, 80,  20 ],
+      "red-bellied woodpecker": [200, 30,  30 ],
+      "northern mockingbird":   [80,  80,  80 ],
     };
     if (colorMap[this.text]) {
       [this.r, this.g, this.b] = colorMap[this.text];
