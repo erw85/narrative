@@ -44,13 +44,22 @@ class Particle {
     this.vx = random(-1, 1);
 		//This sets the range of y movement - try reversing it
     this.vy = random(5, 1);
-		//This sets the range of color - this is what keeps us in yellows
-		//Try using it for all three to create a broader range of color
-		//Or try changing the scale to use the full 0-255
-		this.color = random(100,230);
 		//This sets the starting alpha so it starts bright and fades
 		//Try reversing it! you can start at 0, add 1, and stop at 255
     this.alpha = 255;
+    // Assign a color based on the bird name, default to yellow range
+    let colorMap = {
+      "northern cardinal": [220, 30,  30 ],
+      "blue jay":          [30,  100, 220],
+      "brown thrasher":    [101, 55,  0  ],
+      "mourning dove":     [180, 160, 140],
+      "tufted titmouse":   [130, 130, 130],
+    };
+    if (colorMap[this.text]) {
+      [this.r, this.g, this.b] = colorMap[this.text];
+    } else {
+      this.r = 255; this.g = 255; this.b = random(100, 230);
+    }
 		//This picks a random word for each particle
 		this.text = random(words);
   }
@@ -73,7 +82,7 @@ class Particle {
     //stroke(255);
 		//This keeps R and G values at 255 to allow for yellows
 		//Try changing it!
-    fill(255,255,this.color, this.alpha);
+    fill(this.r, this.g, this.b, this.alpha);
 		//This positions the text
     text(this.text, this.x, this.y);
   }
