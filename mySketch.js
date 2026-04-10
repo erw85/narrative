@@ -59,8 +59,8 @@ class Particle {
     this.x = random(0, windowWidth);
 		//This keeps the y fixed - try reversing it using windowHeight
     this.y = windowHeight;
-		//This sets the range of x movement - try limiting it to + or -
-    this.vx = random(-1, 1);
+    // Base horizontal drift — wind and flocking are layered on top each frame
+    this.baseVx = random(-1, 1);
 		//This sets the range of y movement - try reversing it
     this.vy = random(-5, -1);
     // Random phase for wind drift so each bird sways differently
@@ -76,13 +76,12 @@ class Particle {
   }
 
   update() {
-    // Wind drift — gentle sine-wave sway like riding air currents
-    this.vx += sin(frameCount * 0.015 + this.phase) * 0.05;
-    // Flocking cohesion — slight pull toward the flock center
-    this.vx += (flockX - this.x) * 0.0003;
-    this.vy += (flockY - this.y) * 0.0003;
-    // Keep horizontal speed from drifting too far
-    this.vx = constrain(this.vx, -3, 3);
+    // Wind drift — recomputed each frame so it never accumulates
+    let wind = sin(frameCount * 0.015 + this.phase) * 0.8;
+    // Flocking cohesion — horizontal only, so vy stays constant
+    let flock = (flockX - this.x) * 0.0004;
+    this.vx = this.baseVx + wind + flock;
+    // vy is never modified — rise speed stays steady
     this.x += this.vx;
     this.y += this.vy;
     this.alpha -= 1;
