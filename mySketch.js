@@ -48,31 +48,42 @@ class Cloud {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.size = random(60, 120);
     this.speed = random(0.2, 0.8);
+    // Each cloud gets its own transparency, consistent across all its bumps
+    this.alpha = random(150, 230);
+    // Build a unique set of bumps for this cloud
+    let base = random(40, 100);
+    this.halfWidth = base * 2.2;
+    this.bumps = [];
+    let count = floor(random(4, 9));
+    for (let i = 0; i < count; i++) {
+      this.bumps.push({
+        ox: random(-base, base),
+        oy: random(-base * 0.25, base * 0.25),
+        w:  random(base * 0.6, base * 1.3),
+        h:  random(base * 0.4, base * 0.85),
+      });
+    }
   }
 
   update() {
     this.x += this.speed;
     // Wrap around when the cloud drifts off the right edge
-    if (this.x > windowWidth + this.size * 2) {
-      this.x = -this.size * 2;
+    if (this.x > windowWidth + this.halfWidth) {
+      this.x = -this.halfWidth;
       this.y = random(windowHeight * 0.6);
     }
   }
 
   show() {
     noStroke();
-    fill(255, 255, 255, 200);
-    // Fluffy cloud shape built from overlapping ellipses
-    let s = this.size;
-    ellipse(this.x,           this.y,           s * 1.2, s * 0.8);
-    ellipse(this.x - s * 0.5, this.y + s * 0.1, s * 0.9, s * 0.7);
-    ellipse(this.x + s * 0.5, this.y + s * 0.1, s * 0.9, s * 0.7);
-    ellipse(this.x - s * 0.3, this.y - s * 0.3, s * 0.9, s * 0.8);
-    ellipse(this.x + s * 0.3, this.y - s * 0.3, s * 0.9, s * 0.8);
+    fill(255, 255, 255, this.alpha);
+    for (let b of this.bumps) {
+      ellipse(this.x + b.ox, this.y + b.oy, b.w, b.h);
+    }
   }
 }
+
 
 class Particle {
   constructor() {
