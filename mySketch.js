@@ -47,22 +47,6 @@ class Particle {
 		//This sets the starting alpha so it starts bright and fades
 		//Try reversing it! you can start at 0, add 1, and stop at 255
     this.alpha = 255;
-    // Assign a color based on the bird name, default to yellow range
-    let colorMap = {
-      "northern cardinal": [220, 30,  30 ],
-      "blue jay":          [30,  100, 220],
-      "brown thrasher":    [101, 55,  0  ],
-      "mourning dove":     [180, 160, 140],
-      "tufted titmouse":        [130, 130, 130],
-      "house finch":            [255, 80,  20 ],
-      "red-bellied woodpecker": [200, 30,  30 ],
-      "northern mockingbird":   [80,  80,  80 ],
-    };
-    if (colorMap[this.text]) {
-      [this.r, this.g, this.b] = colorMap[this.text];
-    } else {
-      this.r = 255; this.g = 255; this.b = random(100, 230);
-    }
 		//This picks a random word for each particle
 		this.text = random(words);
   }
@@ -85,7 +69,7 @@ class Particle {
     //stroke(255);
 		//This keeps R and G values at 255 to allow for yellows
 		//Try changing it!
-    fill(this.r, this.g, this.b, this.alpha);
+    fill(255, 0, 0, this.alpha);
 		//This positions the text
     text(this.text, this.x, this.y);
   }
