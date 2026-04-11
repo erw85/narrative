@@ -13,7 +13,16 @@ treeline = [];
 flockX = 0;
 flockY = 0;
 //Just like with Tracery, put anything you want in the ""s
-words = ["mourning dove","house finch","tufted titmouse","northern cardinal","blue jay","brown thrasher","red-bellied woodpecker","northern mockingbird"]
+words = [
+  "northern cardinal","northern cardinal","northern cardinal","northern cardinal","northern cardinal",
+  "house finch","house finch","house finch","house finch","house finch",
+  "tufted titmouse","tufted titmouse","tufted titmouse","tufted titmouse","tufted titmouse",
+  "mourning dove",
+  "blue jay",
+  "brown thrasher",
+  "red-bellied woodpecker",
+  "northern mockingbird",
+]
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
