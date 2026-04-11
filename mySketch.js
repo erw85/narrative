@@ -26,6 +26,7 @@ words = [
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  textSize(36);
   generateTreeline();
   for (let i = 0; i < 12; i++) {
     clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.55)));
