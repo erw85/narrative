@@ -18,7 +18,6 @@ words = ["mourning dove","house finch","tufted titmouse","northern cardinal","bl
 function setup() {
   createCanvas(windowWidth, windowHeight);
   generateTreeline();
-  // A handful of slow, subtle clouds
   for (let i = 0; i < 12; i++) {
     clouds.push(new Cloud(random(windowWidth), random(windowHeight * 0.55)));
   }
@@ -26,30 +25,87 @@ function setup() {
 
 function generateTreeline() {
   treeline = [];
+  let x = -30;
   let baseY = windowHeight - 60;
-  let x = 0;
-  while (x <= windowWidth + 60) {
-    let treeW = random(28, 72);
-    let treeH = random(45, 145);
-    if (random() > 0.4) {
-      // Pine-like: single sharp peak
-      treeline.push({x: x,             y: baseY});
-      treeline.push({x: x + treeW/2,   y: baseY - treeH});
-      treeline.push({x: x + treeW,     y: baseY});
+  while (x <= windowWidth + 80) {
+    let type = random();
+    if (type < 0.50) {
+      // Sabal/Cabbage palm — tall thin trunk, radiating fronds
+      let trunkH   = random(80, 190);
+      let trunkW   = random(6, 12);
+      let lean     = random(-0.12, 0.12);
+      let span     = random(45, 90);
+      let fronds   = [];
+      let nFronds  = floor(random(7, 11));
+      for (let i = 0; i < nFronds; i++) {
+        fronds.push({
+          angle: map(i, 0, nFronds - 1, -PI + 0.25, 0.25),
+          len:   span * random(0.8, 1.2),
+        });
+      }
+      treeline.push({ type:'palm', x, baseY, trunkH, trunkW, lean, fronds });
+      x += random(45, 100);
+    } else if (type < 0.75) {
+      // Live oak — wide rounded canopy
+      let w = random(70, 150);
+      let h = random(55, 115);
+      treeline.push({ type:'oak', x: x + w/2, baseY, w, h });
+      x += w * random(0.6, 0.9);
     } else {
-      // Deciduous: rounded double-bump
-      treeline.push({x: x,              y: baseY});
-      treeline.push({x: x + treeW*0.25, y: baseY - treeH*0.75});
-      treeline.push({x: x + treeW*0.5,  y: baseY - treeH});
-      treeline.push({x: x + treeW*0.75, y: baseY - treeH*0.75});
-      treeline.push({x: x + treeW,      y: baseY});
+      // Saw palmetto — low bushy fan cluster
+      let w = random(50, 100);
+      let h = random(20, 48);
+      treeline.push({ type:'palmetto', x: x + w/2, baseY, w, h });
+      x += w * random(0.5, 0.8);
     }
-    x += treeW * random(0.55, 0.95);
+  }
+}
+
+function drawTreeline() {
+  fill(20, 55, 20);
+  noStroke();
+  for (let tree of treeline) {
+    if (tree.type === 'palm') {
+      let topX = tree.x + tree.trunkH * tree.lean;
+      let topY = tree.baseY - tree.trunkH;
+      // Trunk
+      beginShape();
+      vertex(tree.x - tree.trunkW / 2, tree.baseY);
+      vertex(tree.x + tree.trunkW / 2, tree.baseY);
+      vertex(topX + tree.trunkW / 3,   topY);
+      vertex(topX - tree.trunkW / 3,   topY);
+      endShape(CLOSE);
+      // Fronds
+      for (let f of tree.fronds) {
+        push();
+        translate(topX, topY);
+        rotate(f.angle);
+        beginShape();
+        vertex(0,        0);
+        vertex(f.len * 0.12, -f.len * 0.07);
+        vertex(f.len,        -f.len * 0.04);
+        vertex(f.len * 0.95,  f.len * 0.04);
+        vertex(f.len * 0.12,  f.len * 0.07);
+        endShape(CLOSE);
+        pop();
+      }
+    } else if (tree.type === 'oak') {
+      // Trunk stub
+      rect(tree.x - 6, tree.baseY - 22, 12, 22);
+      // Overlapping ellipses for rounded canopy
+      ellipse(tree.x,                tree.baseY - tree.h * 0.65, tree.w,        tree.h);
+      ellipse(tree.x - tree.w * 0.28, tree.baseY - tree.h * 0.5,  tree.w * 0.72, tree.h * 0.8);
+      ellipse(tree.x + tree.w * 0.28, tree.baseY - tree.h * 0.5,  tree.w * 0.72, tree.h * 0.8);
+    } else {
+      // Saw palmetto: low overlapping fan shapes
+      ellipse(tree.x,                 tree.baseY - tree.h * 0.45, tree.w,        tree.h);
+      ellipse(tree.x - tree.w * 0.22, tree.baseY - tree.h * 0.35, tree.w * 0.65, tree.h * 0.7);
+      ellipse(tree.x + tree.w * 0.22, tree.baseY - tree.h * 0.35, tree.w * 0.65, tree.h * 0.7);
+    }
   }
 }
 
 function drawSky() {
-  // Gradient from deep blue at top to pale horizon blue at bottom
   let topCol    = color(80,  150, 220);
   let bottomCol = color(140, 205, 235);
   noStroke();
@@ -60,22 +116,9 @@ function drawSky() {
   }
 }
 
-function drawTreeline() {
-  fill(20, 55, 20);
-  noStroke();
-  beginShape();
-  vertex(0, windowHeight);
-  for (let p of treeline) {
-    vertex(p.x, p.y);
-  }
-  vertex(windowWidth, windowHeight);
-  endShape(CLOSE);
-}
-
 function draw() {
   drawSky();
 
-  // Clouds float in the sky behind everything else
   for (let cloud of clouds) {
     cloud.update();
     cloud.show();
@@ -99,7 +142,6 @@ function draw() {
     particles[i].update();
     particles[i].show();
     if (particles[i].finished()) {
-      // remove this particle
       particles.splice(i, 1);
     }
   }
@@ -152,21 +194,13 @@ class Cloud {
 
 class Particle {
   constructor() {
-    //This sets the x value to anywhere - try using a static value
     this.x = random(0, windowWidth);
-    //This keeps the y fixed - try reversing it using windowHeight
     this.y = windowHeight;
-    // Base horizontal drift — wind and flocking are layered on top each frame
     this.baseVx = random(-1, 1);
-    //This sets the range of y movement - try reversing it
     this.vy = random(-5, -1);
-    // Random phase for wind drift so each bird sways differently
     this.phase = random(TWO_PI);
-    //This sets the starting alpha so it starts bright and fades
     this.alpha = 255;
-    //This picks a random word for each particle
     this.text = random(words);
-    // Per-bird base color; defaults to red
     let colorMap = {
       "blue jay":              [20,  60,  200],
       "brown thrasher":        [110, 55,  10 ],
@@ -188,23 +222,18 @@ class Particle {
   }
 
   update() {
-    // Wind drift — recomputed each frame so it never accumulates
-    let wind = sin(frameCount * 0.015 + this.phase) * 0.8;
-    // Flocking cohesion — horizontal only, so vy stays constant
+    let wind  = sin(frameCount * 0.015 + this.phase) * 0.8;
     let flock = (flockX - this.x) * 0.0004;
-    this.vx = this.baseVx + wind + flock;
-    // vy is never modified — rise speed stays steady
-    this.x += this.vx;
-    this.y += this.vy;
+    this.vx   = this.baseVx + wind + flock;
+    this.x   += this.vx;
+    this.y   += this.vy;
     this.alpha -= 1;
   }
 
   show() {
     noStroke();
-    // Color by altitude — brightness scales with height for all birds
     let brightness = map(this.y, windowHeight, 0, 0.35, 1.0);
     fill(this.r * brightness, this.g * brightness, this.b * brightness, this.alpha);
-    //This positions the text
     text(this.text, this.x, this.y);
   }
 }
