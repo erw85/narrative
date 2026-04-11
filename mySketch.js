@@ -168,8 +168,13 @@ class Particle {
     this.text = random(words);
     // Per-bird base color; defaults to red
     let colorMap = {
-      "blue jay":       [20,  60,  200],
-      "brown thrasher": [110, 55,  10 ],
+      "blue jay":              [20,  60,  200],
+      "brown thrasher":        [110, 55,  10 ],
+      "northern mockingbird":  [130, 130, 130],
+      "mourning dove":         [150, 130, 110],
+      "red-bellied woodpecker":[40,  40,  40 ],
+      "house finch":           [240, 130, 20 ],
+      "tufted titmouse":       [200, 200, 210],
     };
     if (colorMap[this.text]) {
       [this.r, this.g, this.b] = colorMap[this.text];
