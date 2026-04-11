@@ -166,6 +166,16 @@ class Particle {
     this.alpha = 255;
     //This picks a random word for each particle
     this.text = random(words);
+    // Per-bird base color; defaults to red
+    let colorMap = {
+      "blue jay":       [20,  60,  200],
+      "brown thrasher": [110, 55,  10 ],
+    };
+    if (colorMap[this.text]) {
+      [this.r, this.g, this.b] = colorMap[this.text];
+    } else {
+      this.r = 255; this.g = 0; this.b = 0;
+    }
   }
 
   finished() {
@@ -186,9 +196,9 @@ class Particle {
 
   show() {
     noStroke();
-    // Color by altitude — dark near the ground, bright red high in the sky
+    // Color by altitude — brightness scales with height for all birds
     let brightness = map(this.y, windowHeight, 0, 0.35, 1.0);
-    fill(255 * brightness, 0, 0, this.alpha);
+    fill(this.r * brightness, this.g * brightness, this.b * brightness, this.alpha);
     //This positions the text
     text(this.text, this.x, this.y);
   }
